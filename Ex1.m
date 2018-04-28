@@ -47,7 +47,7 @@ plot(1:N, cv)
 xlabel("Trial number")
 ylabel("Coefficient of variability")
 title("Ex 1 Part 5 - CV across 50 trials")
-mean_cv = mean(cv) % Should be close to 1.
+mean_cv = nanmean(cv) % Should be close to 1.
 
 %%%%%%%%% Part 6 %%%%%%%%%%
 
@@ -56,10 +56,32 @@ ff = fano_factor(ISIs) % Should be close to 1.
 %%%%%%%%% Part 7 %%%%%%%%%%
 
 T = [0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+repeat = 10;
+max_size = 1500; % Set higher for later Ts.
+ISIs = zeros(N, max_size, length(T), repeat);
+ff = zeros(repeat, length(T));
+cv = zeros(repeat, length(T)); % Mean cv for each N trials.
+mean_ff = zeros(1, length(T));
+mean_cv = zeros(1, length(T));
 for i = 1 : length(T)
-    
+    % Calculate ISIs for this T.
+    for j = 1 : repeat
+        for k = 1 : N % Calculate 50 trials for T(i), repeated 'repeat' times.
+            [ISIs(k, :, i, j), ~] = calculateISIs(lambda, T(i), max_size);
+        end
+        curr_ISIs = ISIs(:, :, i, j); % Get ISIs for 50 trials.
+        ff(j, i) = fano_factor(curr_ISIs);
+        cv(j, i) = nanmean(coeff_var(curr_ISIs));
+    end
+    mean(ff(:, i))
+    mean_ff(i) = mean(ff(:, i));
+    mean_cv(i) = mean(cv(:, i));
 end
-
+figure(4);
+plot(T, mean_ff, T, mean_cv);
+xlabel("Time (s)")
+title("Ex 1 Part 7 - Average FF and CV vs. Time")
+legend("Average Fano Factor", "Average CV")
 
 function ff = fano_factor(ISIs)
     t_mean = firing_count(ISIs) / size(ISIs, 1);
