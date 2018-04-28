@@ -17,7 +17,7 @@ figure(1)
 plot(ISIsCum, 1:N, '.k')
 xlabel("Time (s)")
 ylabel("Trial number")
-
+title("Part 1 - Poisson spike trains")
 %%%%%%%%% Part 3 %%%%%%%%%%
 
 % Calculate average firing rate
