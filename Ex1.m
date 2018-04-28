@@ -17,15 +17,13 @@ figure(1)
 plot(ISIsCum, 1:N, '.k')
 xlabel("Time (s)")
 ylabel("Trial number")
-title("Part 1 - Poisson spike trains")
+title("Ex 1Part 1 - Poisson spike trains")
 %%%%%%%%% Part 3 %%%%%%%%%%
 
 % Calculate average firing rate
 
-nans = isnan(ISIsCum);
-nan_occ = sum(sum(nans)); % Number of NaNs
-total_spikes = (N * max_size) - nan_occ;
-avg_f_rate = total_spikes / (N * T) %%%%% Average firing rate %%%%%%%%%%%%%%
+f_count = firing_count(ISIs);
+avg_f_rate = f_count / (N * T) %%%%% Average firing rate %%%%%%%%%%%%%%
 
 %%%%%%%%% Part 4 %%%%%%%%%%
 
@@ -39,17 +37,56 @@ end
 
 mean_bin_fr = mean(bin_fr)
 
-%% TODO: Plot part 4.
+
+%%%%%%%%%%%%%%%%%%%%%%%% TODO: Plot part 4. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%% Part 5 %%%%%%%%%%
+figure(3)
+cv = coeff_var(ISIs);
+plot(1:N, cv)
+xlabel("Trial number")
+ylabel("Coefficient of variability")
+title("Ex 1 Part 5 - CV across 50 trials")
+mean_cv = mean(cv) % Should be close to 1.
 
-cv = zeros(1, N);
-for i = 1 : N
-   cv(i) = nanstd(ISIs(i,:)) / nanmean(ISIs(i,:)); 
+%%%%%%%%% Part 6 %%%%%%%%%%
+
+ff = fano_factor(ISIs) % Should be close to 1.
+
+%%%%%%%%% Part 7 %%%%%%%%%%
+
+T = [0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+for i = 1 : length(T)
+    
 end
 
-cv_mean = mean(cv) % Should be close to 1.
 
+function ff = fano_factor(ISIs)
+    t_mean = firing_count(ISIs) / size(ISIs, 1);
+    t_var = firing_var(ISIs);
+    ff = t_var / t_mean;
+end
+
+function cv = coeff_var(ISIs)
+    N = size(ISIs, 1);
+    cv = zeros(1, N);
+    for i = 1 : N
+       cv(i) = nanstd(ISIs(i,:)) / nanmean(ISIs(i,:)); 
+    end
+end
+
+function y = firing_count(ISIs)
+    y = sum(sum(~isnan(ISIs)));
+end
+
+function y = firing_var(ISIs)
+    counts = zeros(1, size(ISIs, 1));
+    for i = 1 : size(ISIs, 1)
+       c = firing_count(ISIs(i, :));
+       counts(i) = c;
+    end
+    y = var(counts);
+end
 
 
 function [ISI, cumISI] = calculateISIs(lambda, T, max_size)
@@ -59,6 +96,6 @@ function [ISI, cumISI] = calculateISIs(lambda, T, max_size)
     end
     cumISI = cumsum(ISI);
     cumISI(cumISI > T) = NaN;
-    ind = find(isnan(cumISI) == 1);
+    ind = isnan(cumISI) == 1;
     ISI(ind) = NaN;
 end
