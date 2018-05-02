@@ -38,12 +38,12 @@ dt = 0.1 * 10 .^ -3; % ms
 tau_f = 10 * 10 .^ -3; % ms
 tau = 10 * 10 .^ -3; % ms
 t = 500 * 10 .^ -3; % ms
-f_0 = [55, 75, 130];
-%J = [0.1, 0.185, 0.3, 0.4];
+f_0 = [0, 40, 110, 10, 100, 140];
+J = [0.1, 0.185, 0.3, 0.1, 0.185, 0.3];
 time = zeros(1, t/dt);
 f = zeros(1, t/dt);
 resp = zeros(1, t/dt);
-for k = 1 : length(J)
+%for k = 1 : length(J)
     for i = 1 : length(f_0)
         figure(i+1);
         hold on;
@@ -51,8 +51,8 @@ for k = 1 : length(J)
         resp(1) = f_0(i);
         time(1) = 0;
         for j = 1 : t/dt
-            mv = mu_v(J(k), N, f(j), tau);
-            sv = sigma_v(J(k), N, f(j), tau); 
+            mv = mu_v(J(i), N, f(j), tau);
+            sv = sigma_v(J(i), N, f(j), tau); 
             resp(j+1) = response(mv, sv, v_spk, f_max, N);
             df = (((f(j) * -1) + resp(j+1)) / tau_f) * dt;
             f(j+1) = f(j) + df;
@@ -61,9 +61,9 @@ for k = 1 : length(J)
         plot(time, f, time, resp);
         xlabel("Time (s)")
         ylabel("Firing rate (spk/s)")
-        title("Firing rate with J = " + J(k) + ", f_0 = " + f_0(i));
+        title("Firing rate with J = " + J(i) + ", f_0 = " + f_0(i));
     end 
-end
+%end
 
 %legend_labels = strings(1, length(J));
 %for i = 1 : length(legend_labels)
