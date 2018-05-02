@@ -29,16 +29,21 @@ avg_f_rate = f_count / (N * T) %%%%% Average firing rate %%%%%%%%%%%%%%
 
 dt = 0.2;
 bin_fr = zeros(1, T/dt); % Amount of firings in each bin.
-
+middle_pts = zeros(1, T/dt);
 for i = 1 : T / dt
    temp = ISIsCum((ISIsCum >= (i - 1) * dt) & (ISIsCum <= i * dt)); % Find number of firings in bin.
+   temp = sort(temp);
+   middle_pts(i) = (temp(end) + temp(1)) / 2;
    bin_fr(i) = length(temp) / (N * dt); % Calculate bin firing rate.
 end
 
 mean_bin_fr = mean(bin_fr)
+figure(2)
+plot(middle_pts, bin_fr);
+xlabel("Middle points of bin (s)")
+ylabel("Bin firing rate (spk/s)")
+title("Ex 1 Part 4 - Peri-stimulus plot")
 
-
-%%%%%%%%%%%%%%%%%%%%%%%% TODO: Plot part 4. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%% Part 5 %%%%%%%%%%
 figure(3)
